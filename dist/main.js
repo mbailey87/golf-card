@@ -18,8 +18,6 @@ async function initApp() {
     currentCourseId = savedCourseId || courses[0].id;
     teeBoxIndex = savedTeeBoxIndex ? parseInt(savedTeeBoxIndex, 10) : 0;
     playerNames = savedPlayerNames;
-
-    // Set the dropdowns to the saved or default values
     document.getElementById("course-select").value = currentCourseId;
     document.getElementById("tee-box-select").value = teeBoxIndex;
 
@@ -27,11 +25,9 @@ async function initApp() {
     await handleCourseSelection({ target: { value: currentCourseId } });
     await handleTeeSelection();
 
-    // Add event listeners for the dropdowns
     document.getElementById("course-select").addEventListener("change", handleCourseSelection);
     document.getElementById("tee-box-select").addEventListener("change", handleTeeSelection);
 
-    // Update player names in the UI
     updatePlayerNamesUI();
 }
 
@@ -46,16 +42,11 @@ function updatePlayerNamesUI() {
 }
 
 function updatePlayerNames() {
-    // Update playerNames array from the input values
     playerNames = playerNames.map((_, index) => {
         const nameInput = document.getElementById(`player-${index}-name`);
         return nameInput ? nameInput.value : `Player ${index + 1}`;
     });
-
-    // Save the updated names to localStorage
     localStorage.setItem('playerNames', JSON.stringify(playerNames));
-
-    // Update scores to reflect any name changes
     updateScores();
 }
 
@@ -119,7 +110,7 @@ async function populateScorecard() {
         thead.removeChild(thead.lastChild);
     }
 
-    // Create header cells with text inputs for player names
+    // Create headers text inputs for player names
     playerNames.forEach((_, index) => {
         const th = document.createElement('th');
         const nameInput = document.createElement('input');
@@ -132,7 +123,7 @@ async function populateScorecard() {
         thead.appendChild(th);
     });
 
-    // Populate tbody with hole details
+    // Populate hole details
     details.holes.forEach((hole, index) => {
         const row = tbody.insertRow();
         const teeBox = hole.teeBoxes[teeBoxIndex];
@@ -151,10 +142,10 @@ async function populateScorecard() {
         });
     });
 
-    // Setup footer for "Out", "In", "Total" scores
+    // Setup footer scores
     ["in", "out", "total"].forEach((scoreType, index) => {
         const footerRow = tfoot.insertRow();
-        for (let i = 0; i < 4; i++) { // for hole, yardage, handicap, par columns
+        for (let i = 0; i < 4; i++) {
             footerRow.insertCell();
         }
         playerNames.forEach((_, playerIndex) => {
@@ -163,7 +154,6 @@ async function populateScorecard() {
         });
     });
 
-    // Add event listeners to score inputs
     document.querySelectorAll('.player-score').forEach(input => {
         input.addEventListener('input', updateScores);
     });
@@ -173,7 +163,7 @@ function updatePlayerNames() {
     playerNames = Array.from(document.querySelectorAll('.player-name-input'))
         .map(input => input.value);
          localStorage.setItem('playerNames', JSON.stringify(playerNames));
-         updateScores(); // Recalculate scores when player names change
+         updateScores();
 }
 
 function updateScores() {
@@ -183,14 +173,14 @@ function updateScores() {
     scoreInputs.forEach(input => {
         const holeIndex = input.dataset.holeIndex;
         const playerIndex = input.closest('td').cellIndex - 4;
-        if (input.value) { // Only count if there's a value
+        if (input.value) {
             const score = parseInt(input.value, 10);
             if (holeIndex < 9) {
                 scores[playerIndex].in += score;
             } else {
                 scores[playerIndex].out += score;
             }
-            scores[playerIndex].playedHoles++; // Increment the count of played holes
+            scores[playerIndex].playedHoles++;
         }
     });
 
@@ -199,7 +189,7 @@ function updateScores() {
         if (score.playedHoles > 0) {
             scores[index].total = score.out + score.in;
         } else {
-            scores[index].total = 'N/A'; // Set to 'N/A' or another placeholder
+            scores[index].total = 'N/A'; // Set to 'N/A' if no holes have been played
         }
         document.getElementById(`player-${index}-out`).textContent = score.out;
         document.getElementById(`player-${index}-in`).textContent = score.in;
@@ -212,7 +202,7 @@ function evaluateWinnerAndReset() {
     let winners = [];
     const scores = [];
 
-    // Gather scores and determine the lowest score
+    // finds the lowest score and the players with that score
     playerNames.forEach((player, index) => {
         const totalScoreElement = document.getElementById(`player-${index}-total`);
         const totalScore = parseInt(totalScoreElement.textContent, 10);
@@ -234,7 +224,7 @@ function evaluateWinnerAndReset() {
         }
     });
 
-    // Constructing the message based on the number of winners
+    // toast
     let message;
     if (winners.length === 1) {
         message = `${winners[0]} has won with a score of ${lowestScore}! Congratulations!`;
@@ -251,7 +241,7 @@ function evaluateWinnerAndReset() {
 }
 
 function resetGame() {
-        toastr.success('The game has been reset.'); // Notify user of reset   
+        toastr.success('The game has been reset.'); 
         setTimeout(() => {
             localStorage.clear();
             sessionStorage.clear();
@@ -260,6 +250,5 @@ function resetGame() {
          
 }
 
-// Add event listener to your button
 document.getElementById('evaluate-winner-btn').addEventListener('click', evaluateWinnerAndReset);
 document.getElementById('reset-game').addEventListener('click', resetGame);
