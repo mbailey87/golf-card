@@ -7,11 +7,10 @@
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css"
       rel="stylesheet"/>
-    <!-- Add Toastr CSS for notifications -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
-    <script defer src="dist/main.js"></script>
+    <script defer src="main.js"></script>
 </head>
 <body class="bg-gray-100 p-5">
     <div class="mx-auto mx-10 my-10">
@@ -23,13 +22,11 @@
             <div class="mb-4">
                 <label for="course-select" class="block text-gray-700 text-sm font-bold mb-2">Select Course</label>
                 <select id="course-select" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                    <!-- Course options will be populated here -->
                 </select>
             </div>
             <div class="mb-4">
                 <label for="tee-box-select" class="block text-gray-700 text-sm font-bold mb-2">Select Tee</label>
                 <select id="tee-box-select" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
-                    <!-- Tee options will be populated here -->
                 </select>
             </div>
         </div>
@@ -43,14 +40,14 @@
                         <th class="py-3 px-4 text-left">Yardage</th>
                         <th class="py-3 px-4 text-left">Handicap</th>
                         <th class="py-3 px-4 text-left">Par</th>
-                        <!-- Dynamic player name columns will be added here -->
+                        <!--player columns will be added here -->
                     </tr>
                 </thead>
                 <tbody class="text-gray-700">
-                    <!-- Dynamic hole rows will be inserted here -->
+                    <!-- hole rows inserted here -->
                 </tbody>
                 <tfoot>
-                    <!-- Footer for Out, In, and Total scores -->
+                    <!-- Footer for Total scores -->
                 </tfoot>
             </table>
             <button id="evaluate-winner-btn" class="btn p-2 ml-16 mr-5 mb-6 bg-green-200">End Game</button>
