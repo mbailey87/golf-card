@@ -206,3 +206,60 @@ function updateScores() {
         document.getElementById(`player-${index}-total`).textContent = score.total;
     });
 }
+
+function evaluateWinnerAndReset() {
+    let lowestScore = Infinity;
+    let winners = [];
+    const scores = [];
+
+    // Gather scores and determine the lowest score
+    playerNames.forEach((player, index) => {
+        const totalScoreElement = document.getElementById(`player-${index}-total`);
+        const totalScore = parseInt(totalScoreElement.textContent, 10);
+
+        // Only consider players who have a scored total
+        if (!isNaN(totalScore)) {
+            scores.push({ player, score: totalScore });
+
+            if (totalScore < lowestScore) {
+                lowestScore = totalScore;
+            }
+        }
+    });
+
+    // Determine all players who share the lowest score
+    scores.forEach(({ player, score }) => {
+        if (score === lowestScore) {
+            winners.push(player);
+        }
+    });
+
+    // Constructing the message based on the number of winners
+    let message;
+    if (winners.length === 1) {
+        message = `${winners[0]} has won with a score of ${lowestScore}! Congratulations!`;
+    } else if (winners.length === playerNames.length) {
+        // Special message if all players are tied
+        message = "It's a tie between all players!";
+    } else {
+        // Handling multiple winners for a tie with 2-3 players
+        const allWinners = winners.join(', ');
+        message = `It's a tie between ${allWinners}, all scoring ${lowestScore}.`;
+    }
+
+    toastr.info(message);
+}
+
+function resetGame() {
+        toastr.success('The game has been reset.'); // Notify user of reset   
+        setTimeout(() => {
+            localStorage.clear();
+            sessionStorage.clear();
+            location.reload();
+        }, 1000);
+         
+}
+
+// Add event listener to your button
+document.getElementById('evaluate-winner-btn').addEventListener('click', evaluateWinnerAndReset);
+document.getElementById('reset-game').addEventListener('click', resetGame);

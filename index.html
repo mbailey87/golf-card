@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golf Score App</title>
-    <link rel="stylesheet" href="dist/output.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css"
+      rel="stylesheet"/>
     <!-- Add Toastr CSS for notifications -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <script defer src="dist/main.js"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto mt-10">
+<body class="bg-gray-100 p-5">
+    <div class="mx-auto mx-10 my-10">
         <header class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-700">Golf Score App</h1>
         </header>
@@ -30,32 +34,28 @@
             </div>
         </div>
         
-        <!-- Scorecard Section -->
-<div id="scorecard-container" class="shadow-lg">
-    <table class="min-w-full leading-normal">
-        <thead>
-            <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th class="py-3 px-6 text-left">Hole</th>
-                <th class="py-3 px-6 text-left">Yardage</th>
-                <th class="py-3 px-6 text-left">Handicap</th>
-                <th class="py-3 px-6 text-left">Par</th>
-                <!-- Dynamic player name columns will be added here -->
-            </tr>
-        </thead>
-        <tbody class="text-gray-700">
-            <!-- Dynamic hole rows will be inserted here -->
-        </tbody>
-        <tfoot>
-            <!-- Footer for Out, In, and Total scores -->
-        </tfoot>
-    </table>
+                <!-- Scorecard Section -->
+        <div id="scorecard-container" class="shadow-lg min-w-full ">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-4 text-left">Hole</th>
+                        <th class="py-3 px-4 text-left">Yardage</th>
+                        <th class="py-3 px-4 text-left">Handicap</th>
+                        <th class="py-3 px-4 text-left">Par</th>
+                        <!-- Dynamic player name columns will be added here -->
+                    </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                    <!-- Dynamic hole rows will be inserted here -->
+                </tbody>
+                <tfoot>
+                    <!-- Footer for Out, In, and Total scores -->
+                </tfoot>
+            </table>
+            <button id="evaluate-winner-btn" class="btn p-2 ml-16 mr-5 mb-6 bg-green-200">End Game</button>
+            <button id="reset-game" class="btn p-2 mb-6 bg-red-200">Reset Game</button>
+        </div>
 </div>
-
-    </div>
-
-    <!-- Include jQuery for Toastr -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Include Toastr JS for notifications -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 </body>
 </html>
