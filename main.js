@@ -1,7 +1,7 @@
 let currentCourseId = null;
 let courseDetails = {};
 let teeBoxIndex = 0;
-let playerNames = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
+let playerNames = ['Player 1'];
 
 document.addEventListener("DOMContentLoaded", () => {
     initApp();
@@ -42,12 +42,9 @@ function updatePlayerNamesUI() {
 }
 
 function updatePlayerNames() {
-    playerNames = playerNames.map((_, index) => {
-        const nameInput = document.getElementById(`player-${index}-name`);
-        return nameInput ? nameInput.value : `Player ${index + 1}`;
-    });
+    playerNames = Array.from(document.querySelectorAll('.player-name-input')).map(input => input.value);
     localStorage.setItem('playerNames', JSON.stringify(playerNames));
-    updateScores();
+    updateScores(); // Recalculate scores with the updated player names
 }
 
 async function getAvailableGolfCourses() {
@@ -96,33 +93,47 @@ async function handleTeeSelection() {
     await populateScorecard();
 }
 
+document.getElementById('add-player-btn').addEventListener('click', addPlayer);
+
+function addPlayer() {
+    if (playerNames.length < 4) {
+        const playerIndex = playerNames.length;
+        playerNames.push(`Player ${playerIndex + 1}`);
+        localStorage.setItem('playerNames', JSON.stringify(playerNames));
+        populateScorecard(); // Re-populate the scorecard to show the new player
+    } else {
+        toastr.warning('Maximum of 4 players reached.');
+    }
+}
+
 async function populateScorecard() {
     const details = await getGolfCourseDetails(currentCourseId);
     const scorecardTable = document.querySelector("#scorecard-container table");
     const thead = scorecardTable.querySelector("thead tr");
     const tbody = scorecardTable.querySelector("tbody");
     const tfoot = scorecardTable.querySelector("tfoot");
+    const playerColumnWidth = 100 / (playerNames.length + 4);
 
-    // Clear previous content
+    
+
     tbody.innerHTML = "";
     tfoot.innerHTML = "";
     while (thead.children.length > 4) {
         thead.removeChild(thead.lastChild);
     }
 
-    // Create headers text inputs for player names
-    playerNames.forEach((_, index) => {
+    // Dynamically create headers for player names
+    playerNames.forEach((name, index) => {
         const th = document.createElement('th');
         const nameInput = document.createElement('input');
         nameInput.type = 'text';
-        nameInput.value = `Player ${index + 1}`;
+        nameInput.value = name;
         nameInput.id = `player-${index}-name`;
         nameInput.classList.add('player-name-input');
-        nameInput.addEventListener('change', updatePlayerNames);
+        nameInput.addEventListener('change', () => updatePlayerNames());
         th.appendChild(nameInput);
         thead.appendChild(th);
     });
-
     // Populate hole details
     details.holes.forEach((hole, index) => {
         const row = tbody.insertRow();

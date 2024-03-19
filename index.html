@@ -6,6 +6,17 @@
     <title>Golf Score App</title>
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css" rel="stylesheet"/>
+      <style>
+                table {
+                table-layout: fixed;
+                width: 100%;
+                }
+
+                .player-name-input,
+                .player-score {
+                width: 100%; /* This ensures inputs take the full width of the cell */
+                }
+      </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
@@ -14,7 +25,7 @@
 <body class="bg-gray-100 p-5">
     <div class="mx-auto mx-10 my-10">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-700">Golf Score App</h1>
+            <h1 class="text-4xl font-bold text-gray-700">Golf Score App <button id="add-player-btn" class="btn p-2 bg-blue-200">Add Player</button></h1>
         </header>
         
         <div class="mb-6">
@@ -34,11 +45,11 @@
         <div id="scorecard-container" class="shadow-lg min-w-full">
             <table class="min-w-full leading-normal">
                 <thead>
-                    <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                        <th class="py-3 px-4 text-left">Hole</th>
-                        <th class="py-3 px-4 text-left">Yardage</th>
-                        <th class="py-3 px-4 text-left">Handicap</th>
-                        <th class="py-3 px-4 text-left">Par</th>
+                    <tr class="bg-green-200 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 text-left">Hole</th>
+                        <th class="py-3 text-left">Yardage</th>
+                        <th class="py-3 text-left">Handicap</th>
+                        <th class="py-3 text-left">Par</th>
                         <!--player columns will be added here -->
                     </tr>
                 </thead>
