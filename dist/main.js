@@ -1,0 +1,208 @@
+let currentCourseId = null;
+let courseDetails = {};
+let teeBoxIndex = 0;
+let playerNames = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
+
+document.addEventListener("DOMContentLoaded", () => {
+    initApp();
+});
+
+async function initApp() {
+    const courses = await getAvailableGolfCourses();
+    populateCourseSelect(courses);
+
+    // Load saved course ID and tee box index from localStorage
+    const savedCourseId = localStorage.getItem('selectedCourseId');
+    const savedTeeBoxIndex = localStorage.getItem('selectedTeeBoxIndex');
+    const savedPlayerNames = JSON.parse(localStorage.getItem('playerNames')) || playerNames;
+    currentCourseId = savedCourseId || courses[0].id;
+    teeBoxIndex = savedTeeBoxIndex ? parseInt(savedTeeBoxIndex, 10) : 0;
+    playerNames = savedPlayerNames;
+
+    // Set the dropdowns to the saved or default values
+    document.getElementById("course-select").value = currentCourseId;
+    document.getElementById("tee-box-select").value = teeBoxIndex;
+
+    // Update the UI with the selected course and tee box
+    await handleCourseSelection({ target: { value: currentCourseId } });
+    await handleTeeSelection();
+
+    // Add event listeners for the dropdowns
+    document.getElementById("course-select").addEventListener("change", handleCourseSelection);
+    document.getElementById("tee-box-select").addEventListener("change", handleTeeSelection);
+
+    // Update player names in the UI
+    updatePlayerNamesUI();
+}
+
+// Function to update the player names UI based on local storage or defaults
+function updatePlayerNamesUI() {
+    playerNames.forEach((name, index) => {
+        const nameInput = document.getElementById(`player-${index}-name`);
+        if (nameInput) {
+            nameInput.value = name;
+        }
+    });
+}
+
+function updatePlayerNames() {
+    // Update playerNames array from the input values
+    playerNames = playerNames.map((_, index) => {
+        const nameInput = document.getElementById(`player-${index}-name`);
+        return nameInput ? nameInput.value : `Player ${index + 1}`;
+    });
+
+    // Save the updated names to localStorage
+    localStorage.setItem('playerNames', JSON.stringify(playerNames));
+
+    // Update scores to reflect any name changes
+    updateScores();
+}
+
+async function getAvailableGolfCourses() {
+    return fetch("https://exquisite-pastelito-9d4dd1.netlify.app/golfapi/courses.json")
+        .then(response => response.json());
+}
+
+async function getGolfCourseDetails(golfCourseId) {
+    if (!courseDetails[golfCourseId]) {
+        const response = await fetch(`https://exquisite-pastelito-9d4dd1.netlify.app/golfapi/course${golfCourseId}.json`);
+        courseDetails[golfCourseId] = await response.json();
+    }
+    return courseDetails[golfCourseId];
+}
+
+function populateCourseSelect(courses) {
+    const courseSelect = document.getElementById("course-select");
+    courses.forEach(course => {
+        const option = document.createElement("option");
+        option.value = course.id;
+        option.textContent = course.name;
+        courseSelect.appendChild(option);
+    });
+    courseSelect.dispatchEvent(new Event('change')); // Automatically load the initial course
+}
+
+async function handleCourseSelection(ev) {
+    currentCourseId = ev.target.value;
+    const details = await getGolfCourseDetails(currentCourseId);
+    populateTeeBoxSelect(details.holes[0].teeBoxes);
+}
+
+function populateTeeBoxSelect(teeBoxes) {
+    const teeBoxSelect = document.getElementById("tee-box-select");
+    teeBoxSelect.innerHTML = "";
+    teeBoxes.forEach((teeBox, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${teeBox.teeType.toUpperCase()}, ${teeBox.totalYards} yards`;
+        teeBoxSelect.appendChild(option);
+    });
+    teeBoxSelect.dispatchEvent(new Event('change')); // Automatically load the initial tee box
+}
+
+async function handleTeeSelection() {
+    await populateScorecard();
+}
+
+async function populateScorecard() {
+    const details = await getGolfCourseDetails(currentCourseId);
+    const scorecardTable = document.querySelector("#scorecard-container table");
+    const thead = scorecardTable.querySelector("thead tr");
+    const tbody = scorecardTable.querySelector("tbody");
+    const tfoot = scorecardTable.querySelector("tfoot");
+
+    // Clear previous content
+    tbody.innerHTML = "";
+    tfoot.innerHTML = "";
+    while (thead.children.length > 4) {
+        thead.removeChild(thead.lastChild);
+    }
+
+    // Create header cells with text inputs for player names
+    playerNames.forEach((_, index) => {
+        const th = document.createElement('th');
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = `Player ${index + 1}`;
+        nameInput.id = `player-${index}-name`;
+        nameInput.classList.add('player-name-input');
+        nameInput.addEventListener('change', updatePlayerNames);
+        th.appendChild(nameInput);
+        thead.appendChild(th);
+    });
+
+    // Populate tbody with hole details
+    details.holes.forEach((hole, index) => {
+        const row = tbody.insertRow();
+        const teeBox = hole.teeBoxes[teeBoxIndex];
+        row.insertCell().textContent = index + 1;
+        row.insertCell().textContent = teeBox.yards;
+        row.insertCell().textContent = teeBox.hcp;
+        row.insertCell().textContent = teeBox.par;
+
+        playerNames.forEach(() => {
+            const cell = row.insertCell();
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.classList.add('player-score');
+            input.dataset.holeIndex = index;
+            cell.appendChild(input);
+        });
+    });
+
+    // Setup footer for "Out", "In", "Total" scores
+    ["in", "out", "total"].forEach((scoreType, index) => {
+        const footerRow = tfoot.insertRow();
+        for (let i = 0; i < 4; i++) { // for hole, yardage, handicap, par columns
+            footerRow.insertCell();
+        }
+        playerNames.forEach((_, playerIndex) => {
+            const cell = footerRow.insertCell();
+            cell.innerHTML = `${scoreType.charAt(0).toUpperCase() + scoreType.slice(1)}: <span id="player-${playerIndex}-${scoreType}"></span>`;
+        });
+    });
+
+    // Add event listeners to score inputs
+    document.querySelectorAll('.player-score').forEach(input => {
+        input.addEventListener('input', updateScores);
+    });
+}
+
+function updatePlayerNames() {
+    playerNames = Array.from(document.querySelectorAll('.player-name-input'))
+        .map(input => input.value);
+         localStorage.setItem('playerNames', JSON.stringify(playerNames));
+         updateScores(); // Recalculate scores when player names change
+}
+
+function updateScores() {
+    const scoreInputs = document.querySelectorAll('.player-score');
+    const scores = playerNames.map(() => ({ in: 0, out: 0, total: 0, playedHoles: 0 }));
+
+    scoreInputs.forEach(input => {
+        const holeIndex = input.dataset.holeIndex;
+        const playerIndex = input.closest('td').cellIndex - 4;
+        if (input.value) { // Only count if there's a value
+            const score = parseInt(input.value, 10);
+            if (holeIndex < 9) {
+                scores[playerIndex].in += score;
+            } else {
+                scores[playerIndex].out += score;
+            }
+            scores[playerIndex].playedHoles++; // Increment the count of played holes
+        }
+    });
+
+    scores.forEach((score, index) => {
+        // Only update the total if at least one hole has been played
+        if (score.playedHoles > 0) {
+            scores[index].total = score.out + score.in;
+        } else {
+            scores[index].total = 'N/A'; // Set to 'N/A' or another placeholder
+        }
+        document.getElementById(`player-${index}-out`).textContent = score.out;
+        document.getElementById(`player-${index}-in`).textContent = score.in;
+        document.getElementById(`player-${index}-total`).textContent = score.total;
+    });
+}

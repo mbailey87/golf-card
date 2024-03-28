@@ -112,9 +112,6 @@ async function populateScorecard() {
     const thead = scorecardTable.querySelector("thead tr");
     const tbody = scorecardTable.querySelector("tbody");
     const tfoot = scorecardTable.querySelector("tfoot");
-    const playerColumnWidth = 100 / (playerNames.length + 4);
-
-    
 
     tbody.innerHTML = "";
     tfoot.innerHTML = "";
